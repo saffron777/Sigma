@@ -1,0 +1,51 @@
+[safe]
+	directory = D:/Proyectos/Wau/RECO_DIGITAI/Arquitectura
+	directory = D:/Proyectos/Wau/RECO_DIGITAI/catalogos/Catalogos
+	directory = D:/Proyectos/Wau/RECO_DIGITAI/Operaciones
+	directory = D:/Proyectos/Wau/RECO_DIGITAI/Core
+	directory = D:ProyectosWauRECO_DIGITAISuscripciones
+	directory = D:/Proyectos/Wau/RECO_DIGITAI/Suscripciones
+	directory = E:/GCIT/SportBooks.App/sportBooksApp
+	directory = E:/GCIT/SportBooks_Prematch/sportsbook_prematch
+	directory = E:/GCIT/PanelUser/PanelUser
+	directory = E:/GCIT/Proxy/GCITProxy
+	directory = E:/GCIT/GreciaSlots
+	directory = D:/Proyectos/GCIT/Aviatrix
+	directory = D:/Proyectos/GCIT/VIG
+	directory = E:/GCIT/7777Gaming/Gaming
+	directory = D:/Proyectos/GCIT/SportsBook
+	directory = E:/GCIT/SportBooks
+	directory = E:/GCIT/KingMidas/KingMidas
+	directory = D:/Proyectos/Wau/RECO_DIGITAI/Motor-Calculo
+	directory = E:/GCIT/GC-Home/GC-Home
+	directory = E:/GCIT/QueryGateWay
+	directory = E:/GCIT/WebApiTransaccion
+	directory = D:/Proyectos/linkedin-skill-assessments-quizzes
+	directory = D:/Proyectos/GCIT/BetRadarService
+	directory = D:/Proyectos/GCIT/OrtizAPI/OrtizAPI
+	directory = E:/GCIT/LiveWallet
+	directory = E:/GCIT/Core/GCITCore
+	directory = E:/GCIT/Core/GCITCore
+[core]
+	autocrlf = true
+[user]
+	name = Frank Miranda
+	email = frank.alexis@gmail.com
+[difftool "sourcetree"]
+	cmd = "'' "
+[mergetool "sourcetree"]
+	cmd = "'' "
+	trustExitCode = false
+	keepBackup = false
+[credential "https://tfs.reco.com.mx:30443"]
+	provider = generic
+[http "https://tfs.reco.com.mx:30443"]
+	allowNTLMAuth = true
+[gui]
+	recentrepo = E:/GCIT/sportbooksapp
+[credential "https://github.com"]
+	helper = 
+	helper = !'C:\\Program Files\\GitHub CLI\\gh.exe' auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !'C:\\Program Files\\GitHub CLI\\gh.exe' auth git-credential

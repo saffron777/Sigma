@@ -31,7 +31,7 @@ jobs:
       - run: python scripts/collect_licenses.py check
       - run: python scripts/build_release.py
       - name: Publicar artefactos
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             dist/*

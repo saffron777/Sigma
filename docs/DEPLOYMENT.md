@@ -34,6 +34,14 @@ interpolar las variables del servicio. Las más importantes:
 
 No publiques `.env` ni el volumen `instance/`: contienen secretos y datos de usuarios.
 
+## SQL Server
+
+La imagen de Sigma incluye «ODBC Driver 18 for SQL Server», por lo que
+`SIGMA_DATABASE_URL=mssql+pyodbc://…` funciona sin pasos adicionales. El servidor debe ser
+accesible por red desde el contenedor (un SQL Server local de Windows como `.\sqlexpress`
+no lo es). Si el servidor usa un certificado autofirmado, añade `&TrustServerCertificate=yes`
+a la URL. Recuerda la licencia: la edición Developer de SQL Server no es válida en producción.
+
 ## HTTPS con proxy inverso
 
 No expongas Waitress directamente a Internet. Ejemplo con Caddy:

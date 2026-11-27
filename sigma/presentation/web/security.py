@@ -13,7 +13,7 @@ import secrets
 from datetime import timedelta
 from urllib.parse import urlsplit
 
-from flask import Flask, abort, request, session
+from flask import Flask, abort, g, request, session
 
 from sigma.config import Config
 
@@ -50,6 +50,14 @@ def csrf_token() -> str:
     return token
 
 
+def csp_nonce() -> str:
+    """Nonce por petición para el <script> inline que publica el prefijo de URL."""
+    nonce = getattr(g, "csp_nonce", None)
+    if nonce is None:
+        nonce = g.csp_nonce = secrets.token_urlsafe(16)
+    return nonce
+
+
 def init_security(app: Flask, config: Config) -> None:
     allowed = {h.lower() for h in config.allowed_hosts}
     app.config.update(
@@ -62,6 +70,7 @@ def init_security(app: Flask, config: Config) -> None:
         PERMANENT_SESSION_LIFETIME=timedelta(hours=config.session_hours),  # sliding: renewed on every request
     )
     app.jinja_env.globals["csrf_token"] = csrf_token
+    app.jinja_env.globals["csp_nonce"] = csp_nonce
 
     @app.before_request
     def guard_request() -> None:
@@ -78,7 +87,11 @@ def init_security(app: Flask, config: Config) -> None:
 
     @app.after_request
     def add_security_headers(response):
-        response.headers.setdefault("Content-Security-Policy", CONTENT_SECURITY_POLICY)
+        csp = CONTENT_SECURITY_POLICY.replace(
+            "script-src 'self' 'unsafe-eval'",
+            "script-src 'self' 'unsafe-eval' 'nonce-" + csp_nonce() + "'",
+        )
+        response.headers.setdefault("Content-Security-Policy", csp)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")

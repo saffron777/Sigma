@@ -11,7 +11,7 @@ COPY sigma/presentation/web/static/src sigma/presentation/web/static/src
 COPY sigma/presentation/web/static/img sigma/presentation/web/static/img
 RUN mkdir -p sigma/presentation/web/static/css && npm run build
 
-FROM python:3.13-slim-bookworm AS runtime
+FROM python:3.15-slim-bookworm AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \

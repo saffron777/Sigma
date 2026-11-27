@@ -189,11 +189,11 @@ document.addEventListener("alpine:init", () => {
           return; // `applying` stays on until the migration ends
         }
         if (this.mode === "admin") {
-          location.assign(result.setup_required ? "/setup" : "/login");
+          location.assign(window.sigmaBase(result.setup_required ? "/setup" : "/login"));
           return;
         }
         if (!result.setup_required) {
-          location.assign("/login"); // that database already has accounts
+          location.assign(window.sigmaBase("/login")); // that database already has accounts
           return;
         }
         this.applied = target;
@@ -233,7 +233,7 @@ document.addEventListener("alpine:init", () => {
           this.migrating = false;
           this.migrated = true;
           this.applying = false;
-          setTimeout(() => location.assign("/basedatos"), 2500);
+          setTimeout(() => location.assign(window.sigmaBase("/basedatos")), 2500);
         } else if (this.job.state === "failed") {
           this.migrating = false;
           this.applying = false;

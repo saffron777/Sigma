@@ -90,7 +90,7 @@ def session_user(container: Container) -> User | None:
 def _reject(code: str, message: str, page_target: str):
     if _wants_json():
         return jsonify({"error": {"code": code, "message": message, "details": None}}), 401
-    return redirect(page_target)
+    return redirect(request.script_root + page_target)
 
 
 def init_auth(app: Flask) -> None:

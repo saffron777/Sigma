@@ -41,7 +41,7 @@ document.addEventListener("alpine:init", () => {
       try {
         await api("/api/auth/logout", { method: "POST" });
       } finally {
-        location.assign("/login");
+        location.assign(window.sigmaBase("/login"));
       }
     },
   }));

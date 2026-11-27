@@ -61,6 +61,26 @@ MENU = (
 )
 
 
+class _PrefixMiddleware:
+    """Serve the app under ``prefix`` (e.g. ``/sigma``) while keeping it available at the root, so the
+    container healthcheck at ``/health`` keeps working. The reverse proxy only exposes the prefix;
+    a request to exactly ``/sigma`` is redirected to ``/sigma/``."""
+
+    def __init__(self, app, prefix: str) -> None:
+        self.app = app
+        self.prefix = prefix
+
+    def __call__(self, environ, start_response):
+        path = environ.get("PATH_INFO", "")
+        if path == self.prefix:
+            start_response("301 Moved Permanently", [("Location", self.prefix + "/"), ("Content-Length", "0")])
+            return [b""]
+        if path.startswith(self.prefix + "/"):
+            environ["SCRIPT_NAME"] = self.prefix + environ.get("SCRIPT_NAME", "")
+            environ["PATH_INFO"] = path[len(self.prefix):] or "/"
+        return self.app(environ, start_response)
+
+
 def create_app(config: Config | None = None) -> Flask:
     config = config or Config.from_env()
     app = Flask(__name__, template_folder="presentation/web/templates", static_folder="presentation/web/static")
@@ -80,9 +100,11 @@ def create_app(config: Config | None = None) -> Flask:
     init_auth(app)  # …then the session check
     register_blueprints(app)
     register_error_handlers(app)
+    if config.url_prefix:
+        app.wsgi_app = _PrefixMiddleware(app.wsgi_app, config.url_prefix)
 
     nav = [
-        {"title": title, "items": [{"key": key, "href": PAGES[key][0], "label": PAGES[key][1]} for key in keys]}
+        {"title": title, "items": [{"key": key, "href": config.url_prefix + PAGES[key][0], "label": PAGES[key][1]} for key in keys]}
         for title, keys in NAV_GROUPS
     ]
     # Menu bar: resolve page keys to href/label; keep the special markers (__sep__/__label__/__logout__/__about__/__help__) as-is.
@@ -91,10 +113,10 @@ def create_app(config: Config | None = None) -> Flask:
         if key == "__label__":
             return {"kind": "__label__", "label": item[1], "href": None, "key": None}
         if key == "__help__":
-            return {"kind": "__help__", "label": item[2], "href": item[1], "key": None}
+            return {"kind": "__help__", "label": item[2], "href": config.url_prefix + item[1], "key": None}
         if key in ("__sep__", "__logout__", "__about__"):
             return {"kind": key, "label": None, "href": None, "key": None}
-        return {"kind": "page", "label": PAGES[key][1], "href": PAGES[key][0], "key": key}
+        return {"kind": "page", "label": PAGES[key][1], "href": config.url_prefix + PAGES[key][0], "key": key}
 
     menu = [
         {"title": title, "items": [_menu_item(item) for item in items]}
@@ -107,6 +129,7 @@ def create_app(config: Config | None = None) -> Flask:
         license_name=__license__,
         copyright_holder=__copyright__,
         source_url=config.source_url,
+        sigma_url_prefix=config.url_prefix,
         catalog_modules=[(m.key, m.label, m.description) for m in CATALOG_MODULES],
         help_guide=help_content.GUIDE,
         help_reference=help_content.REFERENCE,

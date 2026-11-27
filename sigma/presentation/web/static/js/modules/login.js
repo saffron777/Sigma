@@ -12,7 +12,7 @@ document.addEventListener("alpine:init", () => {
       this.error = "";
       try {
         await api("/api/auth/login", { method: "POST", json: { username: this.username, password: this.password } });
-        location.assign(this.$root.dataset.next || "/");
+        location.assign(window.sigmaBase(this.$root.dataset.next || "/"));
       } catch (error) {
         this.error = error.message;
         this.password = "";

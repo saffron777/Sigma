@@ -12,6 +12,13 @@ export class ApiError extends Error {
 
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? "";
 
+/** The current app-relative path (prefix stripped), used as the ``next`` value after login. */
+const appPath = () => {
+  const full = location.pathname + location.search;
+  const base = window.SIGMA_BASE || "";
+  return base && full.startsWith(base + "/") ? full.slice(base.length) || "/" : full;
+};
+
 /**
  * @param {string} url
  * @param {{method?: string, json?: unknown, form?: FormData, signal?: AbortSignal, keepalive?: boolean}} [options]
@@ -29,7 +36,7 @@ export async function api(url, { method = "GET", json, form, signal, keepalive =
 
   let response;
   try {
-    response = await fetch(url, { method, headers, body, signal, keepalive, credentials: "same-origin" });
+    response = await fetch(window.sigmaBase(url), { method, headers, body, signal, keepalive, credentials: "same-origin" });
   } catch (error) {
     if (error.name === "AbortError") throw error;
     throw new ApiError("No se pudo conectar con el servidor de Sigma. ¿Sigue en ejecución?");
@@ -44,7 +51,7 @@ export async function api(url, { method = "GET", json, form, signal, keepalive =
   }
   if (response.status === 401 && !url.startsWith("/api/auth/")) {
     // the session expired (or the account was disabled): go back to the login page and return here afterwards
-    location.assign(`/login?next=${encodeURIComponent(location.pathname + location.search)}`);
+    location.assign(window.sigmaBase(`/login?next=${encodeURIComponent(appPath())}`));
   }
   if (!response.ok) {
     const info = data?.error;
@@ -93,12 +100,12 @@ export async function fetchFile(url, { method = "GET", json, form, signal } = {}
   }
   let response;
   try {
-    response = await fetch(url, { method, headers, body, signal, credentials: "same-origin" });
+    response = await fetch(window.sigmaBase(url), { method, headers, body, signal, credentials: "same-origin" });
   } catch (error) {
     if (error.name === "AbortError") throw error;
     throw new ApiError("No se pudo conectar con el servidor de Sigma. ¿Sigue en ejecución?");
   }
-  if (response.status === 401) location.assign(`/login?next=${encodeURIComponent(location.pathname + location.search)}`);
+  if (response.status === 401) location.assign(window.sigmaBase(`/login?next=${encodeURIComponent(appPath())}`));
   if (!response.ok) {
     let info = null;
     try { info = (await response.json())?.error; } catch { /* not JSON */ }

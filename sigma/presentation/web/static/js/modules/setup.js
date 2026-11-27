@@ -22,7 +22,7 @@ document.addEventListener("alpine:init", () => {
           method: "POST",
           json: { username: this.username, display_name: this.displayName, password: this.password },
         });
-        location.assign("/");
+        location.assign(window.sigmaBase("/"));
       } catch (error) {
         this.error = error.message;
         this.busy = false;

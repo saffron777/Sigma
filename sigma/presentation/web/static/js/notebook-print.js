@@ -50,7 +50,7 @@ function buildRoot(notebook, options, template) {
   head.className = "nb-print-head";
   {
     const logo = document.createElement("img");
-    logo.src = template?.has_logo ? `/api/templates/${template.id}/logo` : "/static/img/logo-mark.svg";
+    logo.src = template?.has_logo ? window.sigmaBase(`/api/templates/${template.id}/logo`) : window.sigmaBase("/static/img/logo-mark.svg");
     logo.alt = "";
     logo.className = "nb-print-logo";
     head.appendChild(logo);

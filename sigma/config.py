@@ -24,6 +24,16 @@ def load_dotenv(path: Path) -> None:
         os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
 
 
+def _normalize_prefix(value: str) -> str:
+    """Normalize ``SIGMA_URL_PREFIX``: leading slash, no trailing slash; ``""`` means the app is served at the root."""
+    value = (value or "").strip()
+    if not value or value == "/":
+        return ""
+    if not value.startswith("/"):
+        value = "/" + value
+    return value.rstrip("/")
+
+
 def _load_or_create_secret(instance_dir: Path) -> str:
     """Persist a random secret key so sessions survive restarts without being committed anywhere."""
     path = instance_dir / "secret.key"
@@ -63,6 +73,7 @@ class Config:
     ai_requests_per_hour: int = 20
     secure_cookies: bool = False
     allowed_hosts: tuple[str, ...] = ("127.0.0.1", "localhost", "[::1]", "::1")
+    url_prefix: str = ""  # subruta bajo la que se sirve la app (p. ej. "/sigma"); vacío = raíz
     testing: bool = False
     debug: bool = False
 
@@ -92,6 +103,7 @@ class Config:
             "ai_requests_per_hour": int(os.environ.get("SIGMA_AI_REQUESTS_PER_HOUR", "20")),
             "secure_cookies": os.environ.get("SIGMA_SECURE_COOKIES", "").lower() in {"1", "true", "yes"},
             "debug": os.environ.get("SIGMA_DEBUG", "").lower() in {"1", "true", "yes"},
+            "url_prefix": _normalize_prefix(os.environ.get("SIGMA_URL_PREFIX", "")),
         }
         extra_hosts = tuple(h.strip() for h in os.environ.get("SIGMA_ALLOWED_HOSTS", "").split(",") if h.strip())
         if extra_hosts:

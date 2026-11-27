@@ -60,6 +60,24 @@ Con Nginx, reenvía a `http://127.0.0.1:5000` y configura TLS (Certbot). En ambo
 - revisa el límite de subida (`SIGMA_MAX_UPLOAD_MB`) y el tamaño máximo del cuerpo en el proxy;
 - limita quién puede tener permiso de consola (ejecuta código con los permisos del servidor).
 
+## Servir bajo una subruta (p. ej. `/sigma`)
+
+Sigma puede vivir en una subruta, por ejemplo `https://web.ejemplo.org/sigma`. Define
+`SIGMA_URL_PREFIX=/sigma` y, en Nginx, reenvía la ruta completa (sin quitar el prefijo):
+
+```nginx
+location = /sigma { return 301 /sigma/; }
+location /sigma/ {
+    proxy_pass http://127.0.0.1:5000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    client_max_body_size 100m;
+}
+```
+
+Con `SIGMA_URL_PREFIX` vacío Sigma se sirve en la raíz (comportamiento por defecto).
+
 ## Copias de seguridad
 
 El estado vive en `instance/` (base SQLite, `secret.key`, `ai.json`, notebooks, importaciones

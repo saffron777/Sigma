@@ -62,6 +62,7 @@ _add() { grep -q "^$1=" .env || echo "$1=$2" >> .env; }
 [ -n "${SIGMA_DATABASE_URL:-}" ] && _add SIGMA_DATABASE_URL "$SIGMA_DATABASE_URL"
 [ -n "${SIGMA_ALLOWED_HOSTS:-}" ] && _add SIGMA_ALLOWED_HOSTS "$SIGMA_ALLOWED_HOSTS"
 [ -n "${SIGMA_SECURE_COOKIES:-}" ] && _add SIGMA_SECURE_COOKIES "$SIGMA_SECURE_COOKIES"
+[ -n "${SIGMA_URL_PREFIX:-}" ] && _add SIGMA_URL_PREFIX "$SIGMA_URL_PREFIX"
 
 echo "== 4/5 Construir y arrancar =="
 docker compose up --build -d
